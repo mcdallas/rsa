@@ -2,11 +2,19 @@ import rsa
 
 private, public = rsa.generate_keypair(256)
 
-message = b'deadbeef'
+txt = 'deadbeef'
+message = rsa.Message.from_hex(txt)
 
-ciphertext = rsa.encrypt(message, public)
+message.encrypt(public)
+message.decrypt(private)
+assert message == rsa.Message.from_hex(txt)
 
-plaintext = rsa.decrypt(ciphertext, private)
+message.encrypt(private)
+message.decrypt(public)
+assert message == rsa.Message.from_hex(txt)
 
-assert plaintext == message
+message = rsa.Message.from_str('kinakuta')
+signature = message.sign(private)
+assert message.verify(signature, public)
+
 print('It works!')

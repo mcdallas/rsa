@@ -1,4 +1,4 @@
-from primes import random_prime, random_coprime
+from .primes import random_prime, random_coprime
 
 
 def xgcd(b, n):
@@ -32,34 +32,4 @@ def generate_keypair(bits):
     private = (d, n)
     public = (e, n)
     return private, public
-
-
-def bytes_to_int(bts):
-    return int.from_bytes(bts, 'little')
-
-
-def int_to_bytes(i):
-    return i.to_bytes((i.bit_length() + 7) // 8, 'little')
-
-
-def str_to_bytes(s):
-    return str.encode(s, 'utf-8')
-
-
-def bytes_to_str(b):
-    return b.decode('utf-8')
-
-
-def encrypt(message, key):
-    e, n = key
-    m = bytes_to_int(message)
-
-    return pow(m, e, n)
-
-
-def decrypt(cipher, key):
-    d, n = key
-    m = pow(cipher, d, n)
-    return int_to_bytes(m)
-
 
