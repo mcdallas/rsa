@@ -91,6 +91,12 @@ class Message:
     def from_binary(cls, b):
         return cls(int_to_bytes(int(b, 2)))
 
+    @classmethod
+    def from_file(cls, path):
+        with open(path, 'rb') as f:
+            b = f.read()
+        return cls(b)
+
     def int(self):
         return bytes_to_int(self.msg)
 
@@ -117,6 +123,8 @@ class Message:
 
     def encrypt(self, key):
         e, n = key
+        if self.int() >= n:
+            raise RuntimeError('Message must be smaller than the modulus')
         encrypted = pow(self.int(), e, n)
         self.msg = int_to_bytes(encrypted)
 
@@ -127,11 +135,15 @@ class Message:
 
     def sign(self, key):
         d, n = key
-        signature = pow(self.int(), d, n)
+        hashed = self.hash()
+        as_int = hex_to_int(hashed)
+        if as_int >= n:
+            raise RuntimeError(f'Key must be larger than {len(hashed) * 4}-bit')
+        signature = pow(hex_to_int(hashed), d, n)
         return Message.from_int(signature)
 
     def verify(self, signature, key):
         e, n = key
-        message = pow(signature.int(), e, n)
-        return self.msg == int_to_bytes(message)
+        hashed_message = pow(signature.int(), e, n)
+        return self.hash() == int_to_hex(hashed_message)
 

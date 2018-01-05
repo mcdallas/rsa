@@ -1,6 +1,6 @@
 import rsa
 
-private, public = rsa.generate_keypair(256)
+private, public = rsa.generate_keypair(512)
 
 txt = 'deadbeef'
 message = rsa.Message.from_hex(txt)
